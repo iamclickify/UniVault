@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniVault - Your Study Companion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span>🎓</span>
+                <span>UniVault</span>
+            </div>
+            <div class="search-bar">
+                <span style="margin-right: 10px;">🔍</span>
+                <input type="text" placeholder="Search subjects or materials..." id="searchInput">
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Subjects Dashboard -->
+            <div id="dashboardView">
+                <h1 class="page-title">Your Study Materials</h1>
+                <p class="page-subtitle">Select a subject to access PDFs and get help from AI Tutor</p>
+                
+                <div class="subjects-grid" id="subjectsGrid">
+                    <div class="subject-card" data-subject="mathematics">
+                        <div class="subject-icon">📐</div>
+                        <h3>Mathematics</h3>
+                        <p>Calculus, Linear Algebra, Statistics, Differential Equations</p>
+                        <span class="pdf-count">12 PDFs</span>
+                    </div>
+                    
+                    <div class="subject-card" data-subject="physics">
+                        <div class="subject-icon">⚛️</div>
+                        <h3>Physics</h3>
+                        <p>Mechanics, Thermodynamics, Quantum Physics, Electromagnetism</p>
+                        <span class="pdf-count">15 PDFs</span>
+                    </div>
+                    
+                    <div class="subject-card" data-subject="computer-science">
+                        <div class="subject-icon">💻</div>
+                        <h3>Computer Science</h3>
+                        <p>Data Structures, Algorithms, AI/ML, Database Systems</p>
+                        <span class="pdf-count">18 PDFs</span>
+                    </div>
+                    
+                    <div class="subject-card" data-subject="chemistry">
+                        <div class="subject-icon">🧪</div>
+                        <h3>Chemistry</h3>
+                        <p>Organic Chemistry, Inorganic, Physical Chemistry</p>
+                        <span class="pdf-count">10 PDFs</span>
+                    </div>
+
+                    <div class="subject-card" data-subject="biology">
+                        <div class="subject-icon">🧬</div>
+                        <h3>Biology</h3>
+                        <p>Cell Biology, Genetics, Microbiology, Ecology</p>
+                        <span class="pdf-count">14 PDFs</span>
+                    </div>
+
+                    <div class="subject-card" data-subject="engineering">
+                        <div class="subject-icon">⚙️</div>
+                        <h3>Engineering</h3>
+                        <p>Mechanical, Electrical, Civil, Software Engineering</p>
+                        <span class="pdf-count">20 PDFs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Detail View -->
+            <div id="subjectDetailView" class="subject-detail">
+                <button class="back-btn" id="backBtn">← Back to Subjects</button>
+                
+                <div class="subject-header">
+                    <span class="icon" id="subjectIcon"></span>
+                    <div>
+                        <h2 id="subjectTitle"></h2>
+                        <p class="page-subtitle" id="subjectDesc"></p>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 20px; color: #333;">Available Study Materials</h3>
+                <div class="pdf-grid" id="pdfGrid">
+                    <!-- PDFs will be loaded here -->
+                </div>
+
+                <!-- AI Tutor Section -->
+                <div class="ai-section">
+                    <div class="ai-header">
+                        <span class="ai-icon">🤖</span>
+                        <h3>AI Tutor - Gemini</h3>
+                        <span class="status">● Online</span>
+                    </div>
+                    
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai">
+                                <div class="message-avatar">🤖</div>
+                                <div class="message-content">
+                                    Hello! I'm your AI tutor powered by Google Gemini. I can help you understand concepts, solve problems, and answer questions about your study materials. How can I assist you today?
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" placeholder="Ask me anything about your studies...">
+                            <button class="send-btn" id="sendBtn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
