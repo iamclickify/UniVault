@@ -13,17 +13,28 @@
                 <span>🎓</span>
                 <span>UniVault</span>
             </div>
-            <div class="search-bar">
-                <span style="margin-right: 10px;">🔍</span>
-                <input type="text" placeholder="Search subjects or materials..." id="searchInput">
+            <div class="header-right">
+                <div class="search-bar">
+                    <span style="margin-right: 10px;">🔍</span>
+                    <input type="text" placeholder="Search subjects or materials..." id="searchInput">
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-dropdown">
+                        <span id="userName">User</span>
+                        <button class="logout-btn" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
             </div>
         </header>
 
         <div class="main-content">
             <!-- Subjects Dashboard -->
             <div id="dashboardView">
-                <h1 class="page-title">Your Study Materials</h1>
-                <p class="page-subtitle">Select a subject to access PDFs and get help from AI Tutor</p>
+                <div class="welcome-section">
+                    <h1 class="page-title">Welcome back, <span id="userNameDisplay">Student</span>! 👋</h1>
+                    <p class="page-subtitle">Select a subject to access PDFs and get help from AI Tutor</p>
+                </div>
                 
                 <div class="subjects-grid" id="subjectsGrid">
                     <div class="subject-card" data-subject="mathematics">
