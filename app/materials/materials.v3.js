@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = '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';
-const MODEL_NAME = 'groq/compound-mini';
+const MODEL_NAME = 'llama-3.3-70b-versatile';
 
 // State
 // State
@@ -153,21 +153,27 @@ function onZoomOut() {
 async function extractTextFromCurrentPDF() {
     if (!pdfDoc) return;
 
-    currentPdfText = "";
-    const maxPages = Math.min(pdfDoc.numPages, 50); // Increased limit
+    allPagesText = [];
+    currentPdfText = ""; // Keep partially for legacy if needed/debugging
+    const maxPages = pdfDoc.numPages; // Read ALL pages but store efficiently
 
-    if (pdfDoc.numPages > 50) {
-        addMessageToUI(`⚠️ **Note**: This PDF is large (${pdfDoc.numPages} pages). I have read the first 50 pages to stay within memory limits.`, 'ai');
-    }
+    addMessageToUI(`📖 **Indexing PDF**: Reading ${maxPages} pages...`, 'ai');
 
     for (let i = 1; i <= maxPages; i++) {
-        const page = await pdfDoc.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(s => s.str).join(' ');
-        currentPdfText += `--- Page ${i} ---\n${pageText}\n\n`;
+        try {
+            const page = await pdfDoc.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(s => s.str).join(' ');
+            allPagesText[i] = pageText; // 1-indexed to match PDF page numbers
+        } catch (e) {
+            console.warn(`Error reading page ${i}`, e);
+            allPagesText[i] = "[Error reading page]";
+        }
     }
 
-    console.log("Extracted text length:", currentPdfText.length);
+    // Initial summary context (first 5 pages)
+    currentPdfText = allPagesText.slice(1, 6).join("\n\n");
+    console.log("PDF Indexed. Pages:", allPagesText.length - 1);
 }
 
 async function handleUpload(e) {
