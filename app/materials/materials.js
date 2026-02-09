@@ -38,7 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- PDF Logic ---
 
 async function loadPDF(url, filename = 'Document') {
+    // Show loading state
+    addMessageToUI(`Attempting to load **${filename}**...`, 'ai');
+
     try {
+        // 1. Check if file exists via Fetch (to distinguish 404 from other errors)
+        const checkResponse = await fetch(url, { method: 'HEAD' });
+        if (!checkResponse.ok) {
+            throw new Error(`File not found (Status: ${checkResponse.status})`);
+        }
+
+        // 2. Load PDF with PDF.js
         const loadingTask = pdfjsLib.getDocument(url);
         pdfDoc = await loadingTask.promise;
 
@@ -55,11 +65,11 @@ async function loadPDF(url, filename = 'Document') {
         await extractTextFromCurrentPDF();
 
         // Add System Message to Chat
-        addMessageToUI(`Loaded **${filename}**. I've read the content and am ready to answer questions!`, 'ai');
+        addMessageToUI(`✅ Successfully loaded **${filename}**. I've read the content and am ready to answer questions!`, 'ai');
 
     } catch (error) {
         console.error('Error loading PDF:', error);
-        alert('Could not load PDF. ' + error.message);
+        addMessageToUI(`❌ **Error loading PDF**: ${error.message}. \n\nPlease check if the file \`${filename}\` exists in the \`app/materials/pdfs/\` folder.`, 'ai');
     }
 }
 
