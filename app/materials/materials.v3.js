@@ -9,7 +9,8 @@ let pageRendering = false;
 let pageNumPending = null;
 let currentScale = 1.0; // Absolute scale
 let canvas, ctx;
-let currentPdfText = ""; // Extracted text for context
+let currentPdfText = ""; // Extracted text for context (Deprecated in favor of array, kept for safety)
+let allPagesText = []; // Store text per page
 let chatHistory = [];
 
 // DOM Elements
@@ -265,16 +266,34 @@ async function callGeminiAPI(userMessage) {
 
     const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-    // Context Construction
+    // Dynamic Context Construction
+    // 1. Intro (Pages 1-3)
+    let contextStr = "--- DOCUMENT INTRO ---\n";
+    for (let i = 1; i <= Math.min(3, allPagesText.length - 1); i++) {
+        contextStr += `[Page ${i}]: ${allPagesText[i]}\n`;
+    }
+
+    // 2. Focused Context (Current Page +/- 1)
+    contextStr += "\n--- CURRENT VIEW ---\n";
+    const startPage = Math.max(1, pageNum - 1);
+    const endPage = Math.min(allPagesText.length - 1, pageNum + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+        if (i > 3) { // Avoid duplication if overlapping with intro
+            contextStr += `[Page ${i}]: ${allPagesText[i]}\n`;
+        }
+    }
+
     const systemText = `You are a helpful study assistant analyzing a PDF document.
     
-    CONTEXT FROM THE CURRENT PDF:
-    ${currentPdfText ? currentPdfText : "[No PDF Loaded yet]"}
+    CONTEXT (Focused on Page ${pageNum}):
+    ${contextStr}
     
     INSTRUCTIONS:
-    1. Answer based on the PDF content if available.
-    2. If the answer is not in the PDF, use your general knowledge but mention that it's outside the document context.
-    3. Use LaTeX for math.
+    1. Answer based on the provided context.
+    2. The user is currently looking at Page ${pageNum}. Prioritize information from this page.
+    3. If the answer is not in the context, say "I don't see that in the current pages (1-3 or ${startPage}-${endPage})."
+    4. Use LaTeX for math.
     `;
 
     const messages = [
