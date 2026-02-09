@@ -259,7 +259,7 @@ function removeTypingIndicator(id) {
 async function callGeminiAPI(userMessage) {
     if (!GEMINI_API_KEY) throw new Error("API Key missing");
 
-    const API_URL = 'https://api.a4f.co/v1/chat/completions';
+    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
     // Context Construction
     const systemText = `You are a helpful study assistant analyzing a PDF document.

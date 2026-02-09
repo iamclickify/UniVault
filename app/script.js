@@ -333,7 +333,7 @@ async function callGeminiAPI(userMessage) {
     }
 
     // Using Custom Provider (OpenAI Compatible Endpoint)
-    const API_URL = 'https://api.a4f.co/v1/chat/completions';
+    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
     // 1. Construct System Instruction
     let subjectContext = currentSubject === 'general' ? 'General Knowledge' : subjectsData[currentSubject]?.title;
