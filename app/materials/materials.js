@@ -93,14 +93,8 @@ function renderPage(num) {
     document.getElementById('pageNum').textContent = num;
 
     pdfDoc.getPage(num).then(function (page) {
-        // Adjust scale to fit width * zoomLevel
-        const containerWidth = document.querySelector('.viewer-body').clientWidth - 48; // padding
-        const unscaledViewport = page.getViewport({ scale: 1 });
-        const fitWidthScale = containerWidth / unscaledViewport.width;
-
-        scale = fitWidthScale * zoomLevel;
-
-        const scaledViewport = page.getViewport({ scale: scale });
+        // Use the absolute currentScale directly
+        const scaledViewport = page.getViewport({ scale: currentScale });
 
         canvas.height = scaledViewport.height;
         canvas.width = scaledViewport.width;
