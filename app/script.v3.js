@@ -17,7 +17,7 @@
 // Configuration
 const GEMINI_API_KEY = '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'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
 // Available Models: 'gemini-2.0-flash-exp' (Free), 'gemini-1.5-flash' (Stable), 'gemini-1.5-pro' (Limited)
-const MODEL_NAME = 'llama-3.3-70b-versatile';
+const MODEL_NAME = 'groq/compound-mini';
 
 // Application State
 let currentSubject = 'general';

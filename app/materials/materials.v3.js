@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = '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';
-const MODEL_NAME = 'llama-3.3-70b-versatile';
+const MODEL_NAME = 'groq/compound-mini';
 
 // State
 // State
