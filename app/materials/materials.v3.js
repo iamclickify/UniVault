@@ -153,7 +153,11 @@ async function extractTextFromCurrentPDF() {
     if (!pdfDoc) return;
 
     currentPdfText = "";
-    const maxPages = Math.min(pdfDoc.numPages, 10); // Limit to avoid huge context
+    const maxPages = Math.min(pdfDoc.numPages, 50); // Increased limit
+
+    if (pdfDoc.numPages > 50) {
+        addMessageToUI(`⚠️ **Note**: This PDF is large (${pdfDoc.numPages} pages). I have read the first 50 pages to stay within memory limits.`, 'ai');
+    }
 
     for (let i = 1; i <= maxPages; i++) {
         const page = await pdfDoc.getPage(i);
