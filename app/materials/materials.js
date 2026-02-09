@@ -6,7 +6,8 @@ let pdfDoc = null;
 let pageNum = 1;
 let pageRendering = false;
 let pageNumPending = null;
-let scale = 1.0; // Zoom level, can be dynamic
+let scale = 1.0; // Current actual scale
+let zoomLevel = 1.0; // User zoom factor (1.0 = fit width)
 let canvas, ctx;
 let currentPdfText = ""; // Extracted text for context
 let chatHistory = [];
@@ -24,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     document.getElementById('prevPage').addEventListener('click', onPrevPage);
     document.getElementById('nextPage').addEventListener('click', onNextPage);
+    document.getElementById('zoomIn').addEventListener('click', onZoomIn);
+    document.getElementById('zoomOut').addEventListener('click', onZoomOut);
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
     document.getElementById('chatInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
@@ -84,11 +87,12 @@ function renderPage(num) {
     document.getElementById('pageNum').textContent = num;
 
     pdfDoc.getPage(num).then(function (page) {
-        // Adjust scale to fit width
+        // Adjust scale to fit width * zoomLevel
         const containerWidth = document.querySelector('.viewer-body').clientWidth - 48; // padding
-        const viewport = page.getViewport({ scale: 1 });
-        scale = containerWidth / viewport.width;
-        if (scale > 1.5) scale = 1.5; // Cap zoom
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const fitWidthScale = containerWidth / unscaledViewport.width;
+
+        scale = fitWidthScale * zoomLevel;
 
         const scaledViewport = page.getViewport({ scale: scale });
 
@@ -131,6 +135,18 @@ function onNextPage() {
     if (pageNum >= pdfDoc.numPages) return;
     pageNum++;
     queueRenderPage(pageNum);
+}
+
+function onZoomIn() {
+    zoomLevel += 0.2;
+    queueRenderPage(pageNum);
+}
+
+function onZoomOut() {
+    if (zoomLevel > 0.4) {
+        zoomLevel -= 0.2;
+        queueRenderPage(pageNum);
+    }
 }
 
 async function extractTextFromCurrentPDF() {
