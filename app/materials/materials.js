@@ -42,10 +42,15 @@ async function loadPDF(url, filename = 'Document') {
     addMessageToUI(`Attempting to load **${filename}**...`, 'ai');
 
     try {
-        // 1. Check if file exists via Fetch (to distinguish 404 from other errors)
-        const checkResponse = await fetch(url, { method: 'HEAD' });
-        if (!checkResponse.ok) {
-            throw new Error(`File not found (Status: ${checkResponse.status})`);
+        // 1. Try to check file existence (optional, helps debugging but shouldn't block)
+        try {
+            const checkResponse = await fetch(url, { method: 'HEAD' });
+            if (!checkResponse.ok) {
+                console.warn(`Fetch check failed: ${checkResponse.status}`);
+            }
+        } catch (fetchErr) {
+            // Ignore fetch errors (likely file:// protocol restriction)
+            console.log("Fetch check skipped (likely local file):", fetchErr);
         }
 
         // 2. Load PDF with PDF.js
@@ -69,7 +74,7 @@ async function loadPDF(url, filename = 'Document') {
 
     } catch (error) {
         console.error('Error loading PDF:', error);
-        addMessageToUI(`❌ **Error loading PDF**: ${error.message}. \n\nPlease check if the file \`${filename}\` exists in the \`app/materials/pdfs/\` folder.`, 'ai');
+        addMessageToUI(`❌ **Error loading PDF**: ${error.message}. \n\nIf you are opening this file directly (file://), some browsers block it. Try using a local server (e.g., VS Code Live Server).`, 'ai');
     }
 }
 
