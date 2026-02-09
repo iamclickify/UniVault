@@ -65,13 +65,18 @@
     flex: 1;
     overflow: auto;
     display: flex;
-    justify-content: center;
+    /* justify-content: center; <-- Removed to prevent clipping on overflow */
     padding: 24px;
     position: relative;
+    /* Ensure child can be centered but scrollable */
+    align-items: flex-start;
 }
 
 #pdfCanvas {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: block;
+    margin: 0 auto;
+    /* Center horizontally */
     max-width: 100%;
 }
 

@@ -2,12 +2,12 @@ const GEMINI_API_KEY = 'org_01kgynwc28fz885ph7aear5yj4';
 const MODEL_NAME = 'openai/gpt-oss-120b';
 
 // State
+// State
 let pdfDoc = null;
 let pageNum = 1;
 let pageRendering = false;
 let pageNumPending = null;
-let scale = 1.0; // Current actual scale
-let zoomLevel = 1.0; // User zoom factor (1.0 = fit width)
+let currentScale = 1.0; // Absolute scale
 let canvas, ctx;
 let currentPdfText = ""; // Extracted text for context
 let chatHistory = [];
@@ -63,6 +63,12 @@ async function loadPDF(url, filename = 'Document') {
         currentPdfName.textContent = filename;
         document.getElementById('pageCount').textContent = pdfDoc.numPages;
         noPdfPlaceholder.style.display = 'none';
+
+        // Calculate Initial Scale (Fit Width)
+        const page = await pdfDoc.getPage(1);
+        const containerWidth = document.querySelector('.viewer-body').clientWidth - 48;
+        const viewport = page.getViewport({ scale: 1 });
+        currentScale = containerWidth / viewport.width;
 
         // Reset View
         pageNum = 1;
@@ -138,13 +144,13 @@ function onNextPage() {
 }
 
 function onZoomIn() {
-    zoomLevel += 0.2;
+    currentScale *= 1.2;
     queueRenderPage(pageNum);
 }
 
 function onZoomOut() {
-    if (zoomLevel > 0.4) {
-        zoomLevel -= 0.2;
+    if (currentScale > 0.4) {
+        currentScale /= 1.2;
         queueRenderPage(pageNum);
     }
 }
