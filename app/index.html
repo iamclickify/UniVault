@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniVault - AI Study Companion</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- PDF.js for text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+        integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span>🎓</span>
+                    <span>UniVault</span>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <h3>Subjects</h3>
+                    <div id="subjectList" class="nav-list">
+                        <!-- Dynamic Subjects will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>History</h3>
+                    <div class="nav-list">
+                        <div class="nav-item">
+                            <span class="nav-icon">🕒</span>
+                            <span>Recent Chat 1</span>
+                        </div>
+                        <div class="nav-item">
+                            <span class="nav-icon">🕒</span>
+                            <span>Calculus Notes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-mini-profile" id="profileTrigger" style="cursor: pointer;">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <span id="userName" class="user-name">User</span>
+                        <span class="user-role">Student</span>
+                    </div>
+                    <span style="color: #94A3B8;">⋮</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-chat">
+            <header class="chat-header">
+                <div class="chat-header-info">
+                    <span class="current-icon" id="currentSubjectIcon">🤖</span>
+                    <div>
+                        <h2 id="currentSubjectTitle">General Tutor</h2>
+                        <span class="status-badge" id="aiStatus">Gemini Active</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search in chat..." id="searchInput">
+                    </div>
+                    <button id="clearChatBtn" class="action-btn" title="New Chat">✨ New Chat</button>
+                </div>
+            </header>
+
+            <div class="chat-workspace">
+                <div class="chat-messages-container" id="chatScrollArea">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                Hello! I'm your UniVault AI tutor. Select a subject from the sidebar or just start
+                                chatting. You can upload PDFs to ask accurate questions!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PDF Attachment Bar -->
+                <div id="pdfStatusContainer" class="pdf-status-container"></div>
+
+                <div class="chat-input-wrapper">
+                    <div class="chat-input-area">
+                        <label class="attach-btn" title="Upload PDF">
+                            📎
+                            <input type="file" id="pdfUploadInput" accept=".pdf" style="display: none;">
+                        </label>
+                        <input type="text" id="chatInput" placeholder="Ask a question or describe your problem...">
+                        <button class="send-btn" id="sendBtn">Send</button>
+                    </div>
+                    <p class="input-hint">Gemini can make mistakes. Please double-check important info.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Menu Dropdown -->
+    <div id="profileMenu" class="profile-menu hidden">
+        <a href="dashboard.html" class="menu-item">📊 Dashboard</a>
+        <a href="#" class="menu-item">⚙️ Settings</a>
+        <div class="menu-divider"></div>
+        <a href="#" id="logoutBtn" class="menu-item danger">🚪 Logout</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

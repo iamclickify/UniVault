@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - UniVault</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for Stats -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Same as Index but with different active state) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" onclick="window.location.href='index.html'">
+                    <span>🎓</span>
+                    <span>UniVault</span>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <h3>Menu</h3>
+                    <div class="nav-list">
+                        <div class="nav-item" onclick="window.location.href='index.html'">
+                            <span class="nav-icon">💬</span>
+                            <span>Chat</span>
+                        </div>
+                        <div class="nav-item active">
+                            <span class="nav-icon">📊</span>
+                            <span>Dashboard</span>
+                        </div>
+                        <div class="nav-item">
+                            <span class="nav-icon">📅</span>
+                            <span>Schedule</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-mini-profile" id="profileTrigger">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <span id="userName" class="user-name">User</span>
+                        <span class="user-role">Student</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="main-dashboard">
+            <header class="dashboard-header">
+                <div>
+                    <h1>Welcome back, <span id="dash-username">Student</span>! 👋</h1>
+                    <p class="subtitle">Here's your learning overview for today.</p>
+                </div>
+                <div class="date-display" id="currentDate">Monday, Oct 24</div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Row -->
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <h3>Study Hours</h3>
+                        <p class="stat-value">12.5h</p>
+                        <span class="stat-change positive">+2.5h this week</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-info">
+                        <h3>Streak</h3>
+                        <p class="stat-value">5 Days</p>
+                        <span class="stat-change">Keep it up!</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-info">
+                        <h3>Sessions</h3>
+                        <p class="stat-value">24</p>
+                        <span class="stat-change">Total Chats</span>
+                    </div>
+                </div>
+
+                <!-- Charts / Activity Area -->
+                <div class="dashboard-card wide-card">
+                    <h3>Weekly Activity</h3>
+                    <canvas id="activityChart"></canvas>
+                </div>
+
+                <!-- Recent Topics -->
+                <div class="dashboard-card">
+                    <h3>Recent Topics</h3>
+                    <div class="recent-list" id="recentActivityList">
+                        <!-- Dynamic Content -->
+                        <div class="recent-item">
+                            <span class="topic-icon">⚛️</span>
+                            <div class="topic-info">
+                                <h4>Quantum Physics</h4>
+                                <span>2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="recent-item">
+                            <span class="topic-icon">📐</span>
+                            <div class="topic-info">
+                                <h4>Calculus II</h4>
+                                <span>Yesterday</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Menu Dropdown -->
+    <div id="profileMenu" class="profile-menu hidden">
+        <a href="#" class="menu-item">⚙️ Settings</a>
+        <div class="menu-divider"></div>
+        <a href="#" id="logoutBtn" class="menu-item danger">🚪 Logout</a>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
