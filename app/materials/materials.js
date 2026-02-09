@@ -1,4 +1,4 @@
-const GEMINI_API_KEY = 'org_01kgynwc28fz885ph7aear5yj4';
+const GEMINI_API_KEY = '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';
 const MODEL_NAME = 'openai/gpt-oss-120b';
 
 // State

@@ -15,7 +15,7 @@
 })();
 
 // Configuration
-const GEMINI_API_KEY = 'org_01kgynwc28fz885ph7aear5yj4'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
+const GEMINI_API_KEY = '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'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
 // Available Models: 'gemini-2.0-flash-exp' (Free), 'gemini-1.5-flash' (Stable), 'gemini-1.5-pro' (Limited)
 const MODEL_NAME = 'openai/gpt-oss-120b';
 
