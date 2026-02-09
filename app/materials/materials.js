@@ -295,8 +295,23 @@ async function callGeminiAPI(userMessage) {
     });
 
     if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || 'API Request Failed');
+        const errorText = await response.text();
+        console.error("API Error Log:", {
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries()),
+            body: errorText
+        });
+
+        let errorMessage = `API Error (${response.status})`;
+        try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.error?.message || errorMessage;
+        } catch (e) {
+            errorMessage = errorText; // Use raw text if not JSON
+        }
+
+        throw new Error(errorMessage);
     }
 
     const data = await response.json();
