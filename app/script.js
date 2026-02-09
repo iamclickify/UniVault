@@ -15,9 +15,9 @@
 })();
 
 // Configuration
-const GEMINI_API_KEY = 'ddc-a4f-b054e9c9f6cc450b8df1b6aec3e61283'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
+const GEMINI_API_KEY = 'org_01kgynwc28fz885ph7aear5yj4'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
 // Available Models: 'gemini-2.0-flash-exp' (Free), 'gemini-1.5-flash' (Stable), 'gemini-1.5-pro' (Limited)
-const MODEL_NAME = 'provider-5/gemini-3-pro';
+const MODEL_NAME = 'openai/gpt-oss-120b';
 
 // Application State
 let currentSubject = 'general';

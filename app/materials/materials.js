@@ -1,6 +1,5 @@
-// Configuration
-const GEMINI_API_KEY = 'ddc-a4f-b054e9c9f6cc450b8df1b6aec3e61283';
-const MODEL_NAME = 'provider-5/gemini-3-pro';
+const GEMINI_API_KEY = 'org_01kgynwc28fz885ph7aear5yj4';
+const MODEL_NAME = 'openai/gpt-oss-120b';
 
 // State
 let pdfDoc = null;
