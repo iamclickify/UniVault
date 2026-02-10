@@ -15,9 +15,8 @@
 })();
 
 // Configuration
-const GEMINI_API_KEY = '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'; //AIzaSyB_4Uc458Vhx1tZ2-LBM5bTYD9SYWepC-Y
-// Available Models: 'gemini-2.0-flash-exp' (Free), 'gemini-1.5-flash' (Stable), 'gemini-1.5-pro' (Limited)
-const MODEL_NAME = 'llama-3.3-70b-versatile';
+// API Key is now handled by the Python Backend (app/Rag/.env)
+
 
 // Application State
 let currentSubject = 'general';
@@ -237,6 +236,8 @@ function setupProfileMenu() {
     }
 }
 
+const PYTHON_API_URL = 'http://localhost:5000/api';
+
 function setupPdfUpload() {
     const input = document.getElementById('pdfUploadInput');
     if (input) {
@@ -248,15 +249,29 @@ function setupPdfUpload() {
                     return;
                 }
 
-                // Add system message (transient)
-                addSystemMessage(`Reading 📄 ${file.name}...`);
+                addSystemMessage(`Uploading and ingesting 📄 ${file.name}...`);
+
+                const formData = new FormData();
+                formData.append('file', file);
 
                 try {
-                    await extractTextFromPDF(file);
-                    addSystemMessage(`Attached 📄 ${file.name}`);
+                    const response = await fetch(`${PYTHON_API_URL}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error('Upload failed');
+
+                    const data = await response.json();
+                    addSystemMessage(`Successfully ingested 📄 ${file.name} (${data.chunks} chunks)`);
+
+                    // Allow multiple files? For now, let's just show it in UI
+                    attachedFiles.push({ name: file.name });
+                    updatePdfStatusUI();
+
                 } catch (error) {
                     console.error(error);
-                    addSystemMessage(`Failed to read ${file.name}`);
+                    addSystemMessage(`Failed to upload ${file.name}: ${error.message}`);
                 }
                 input.value = '';
             }
@@ -264,44 +279,8 @@ function setupPdfUpload() {
     }
 }
 
-async function extractTextFromPDF(file) {
-    if (attachedFiles.some(f => f.name === file.name)) return;
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
-    const maxPages = Math.min(pdf.numPages, 10); // Limit 10 pages
-
-    for (let i = 1; i <= maxPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        fullText += `--- Page ${i} ---\n${textContent.items.map(s => s.str).join(' ')}\n\n`;
-    }
-
-    attachedFiles.push({ name: file.name, text: fullText });
-    updatePdfStatusUI();
-}
-
-function updatePdfStatusUI() {
-    if (!pdfStatusContainer) return;
-    pdfStatusContainer.innerHTML = '';
-    if (attachedFiles.length > 0) {
-        pdfStatusContainer.style.display = 'flex';
-        attachedFiles.forEach(file => {
-            const item = document.createElement('div');
-            item.className = 'pdf-status-item';
-            item.innerHTML = `📄 ${file.name} <button onclick="removeFile('${file.name}')">×</button>`;
-            pdfStatusContainer.appendChild(item);
-        });
-    } else {
-        pdfStatusContainer.style.display = 'none';
-    }
-}
-
-window.removeFile = function (fileName) {
-    attachedFiles = attachedFiles.filter(f => f.name !== fileName);
-    updatePdfStatusUI();
-};
+// We no longer need extractTextFromPDF since the backend handles it.
+// keeping updatePdfStatusUI as is mostly, but we don't have text content client side anymore
 
 async function sendMessage() {
     const input = document.getElementById('chatInput');
@@ -316,84 +295,46 @@ async function sendMessage() {
     const typingId = showTypingIndicator();
 
     try {
-        const response = await callGeminiAPI(text);
+        const responseText = await callPythonRAG(text);
         removeTypingIndicator(typingId);
 
         // 2. Add AI Response to UI & History
-        addMessageToUI(response, 'ai', true);
+        addMessageToUI(responseText, 'ai', true);
     } catch (error) {
         removeTypingIndicator(typingId);
-        addMessageToUI(`Error: ${error.message}`, 'ai', false); // Don't save errors
+        addMessageToUI(`Error: ${error.message}`, 'ai', false);
     }
 }
 
-async function callGeminiAPI(userMessage) {
-    if (!GEMINI_API_KEY) {
-        throw new Error("Please set your API Key in script.js");
+async function callPythonRAG(userMessage) {
+    // We send just the query. The backend handles retrieval from vector DB.
+    // If we want to support conversation history in RAG, we'd need to send history or manage it on backend.
+    // For this MVP, we send the current query.
+
+    try {
+        const response = await fetch(`${PYTHON_API_URL}/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query: userMessage })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        return marked.parse(data.response);
+    } catch (e) {
+        console.error("RAG API Error:", e);
+        throw e;
     }
-
-    // Using Custom Provider (OpenAI Compatible Endpoint)
-    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
-    // 1. Construct System Instruction
-    let subjectContext = currentSubject === 'general' ? 'General Knowledge' : subjectsData[currentSubject]?.title;
-    let systemText = `You are an expert AI tutor for ${subjectContext}. 
-    
-    Start by reading the user's question carefully.
-    
-    CRITICAL INSTRUCTIONS:
-    1. **Be Concise & Student-Friendly**: Use simple language. Avoid lengthy, complex academic explanations unless asked.
-    2. **Use the Simplest Method**: Solve problems using standard high-school or undergraduate methods. Avoid overly advanced techniques if a simpler one exists.
-    3. **Step-by-Step, but Brief**: Show your steps clearly, but keep descriptions short.
-    4. **Format Math Beautifully**: Use LaTeX for ALL math expressions.
-       - Use $...$ for inline math.
-       - Use $$...$$ for block equations.
-    5. **Direct Answer**: Start with the direct answer or main concept, then explain.`;
-
-    if (attachedFiles.length > 0) {
-        systemText += `\n\nCONTEXT DOCUMENTS:\n`;
-        attachedFiles.forEach((f, i) => systemText += `[Doc ${i + 1}: ${f.name}]\n${f.text}\n`);
-    }
-
-    // 2. Build Messages Array (OpenAI Format)
-    const validHistory = chatHistory
-        .filter(msg => msg.role && msg.parts && msg.parts[0].text)
-        .map(msg => ({
-            role: msg.role === 'model' ? 'assistant' : 'user',
-            content: msg.parts[0].text
-        }));
-
-    const recentHistory = validHistory.slice(-6);
-
-    const messages = [
-        { role: 'system', content: systemText },
-        ...recentHistory,
-        { role: 'user', content: userMessage }
-    ];
-
-    const payload = {
-        model: MODEL_NAME,
-        messages: messages,
-        temperature: 0.7
-    };
-
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${GEMINI_API_KEY}`
-        },
-        body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-        const errData = await response.json();
-        console.error("API Error:", errData);
-        throw new Error(errData.error?.message || `API Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return marked.parse(data.choices[0].message.content);
 }
 
 function addMessageToUI(text, type, saveToHistory = true) {
