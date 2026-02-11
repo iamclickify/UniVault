@@ -18,7 +18,7 @@ class RAGEngine:
         os.environ["CHROMA_GOOGLE_GENAI_API_KEY"] = self.api_key
         
         genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Initialize ChromaDB (Persistent)
         self.chroma_client = chromadb.PersistentClient(path="./chroma_db")
