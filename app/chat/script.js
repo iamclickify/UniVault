@@ -2,7 +2,7 @@
 (function () {
     const session = sessionStorage.getItem('univault_session');
     if (!session) {
-        window.location.href = '../auth/login.html';
+        window.location.href = '../../auth/login.html';
         return;
     }
     const userData = JSON.parse(session);
@@ -198,7 +198,7 @@ function setupEventListeners() {
             e.preventDefault();
             if (confirm('Log out?')) {
                 sessionStorage.removeItem('univault_session');
-                window.location.href = '../auth/login.html';
+                window.location.href = '../../auth/login.html';
             }
         });
     }
@@ -206,7 +206,7 @@ function setupEventListeners() {
     const logo = document.querySelector('.logo');
     if (logo) {
         logo.addEventListener('click', () => {
-            window.location.href = '../home/index.html';
+            window.location.href = '../../home/index.html';
         });
     }
 

@@ -1,5 +1,5 @@
 @echo off
 echo Starting UniVault RAG Server...
 echo API listening on port 5000...
-"..\..\.venv\Scripts\python.exe" server.py
+".venv\Scripts\python.exe" app/backend/server.py
 pause

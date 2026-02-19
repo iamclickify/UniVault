@@ -1,5 +1,6 @@
-const GEMINI_API_KEY = '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';
-const MODEL_NAME = 'llama-3.3-70b-versatile';
+// Configuration
+// API Key is handled by Python Backend
+
 
 // State
 // State
@@ -9,8 +10,6 @@ let pageRendering = false;
 let pageNumPending = null;
 let currentScale = 1.0; // Absolute scale
 let canvas, ctx;
-let currentPdfText = ""; // Extracted text for context (Deprecated in favor of array, kept for safety)
-let allPagesText = []; // Store text per page
 let chatHistory = [];
 
 // DOM Elements
@@ -74,9 +73,6 @@ async function loadPDF(url, filename = 'Document') {
         // Reset View
         pageNum = 1;
         renderPage(pageNum);
-
-        // Extract Text for Gemini Context
-        await extractTextFromCurrentPDF();
 
         // Add System Message to Chat
         addMessageToUI(`✅ Successfully loaded **${filename}**. I've read the content and am ready to answer questions!`, 'ai');
@@ -150,31 +146,7 @@ function onZoomOut() {
     }
 }
 
-async function extractTextFromCurrentPDF() {
-    if (!pdfDoc) return;
-
-    allPagesText = [];
-    currentPdfText = ""; // Keep partially for legacy if needed/debugging
-    const maxPages = pdfDoc.numPages; // Read ALL pages but store efficiently
-
-    addMessageToUI(`📖 **Indexing PDF**: Reading ${maxPages} pages...`, 'ai');
-
-    for (let i = 1; i <= maxPages; i++) {
-        try {
-            const page = await pdfDoc.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(s => s.str).join(' ');
-            allPagesText[i] = pageText; // 1-indexed to match PDF page numbers
-        } catch (e) {
-            console.warn(`Error reading page ${i}`, e);
-            allPagesText[i] = "[Error reading page]";
-        }
-    }
-
-    // Initial summary context (first 5 pages)
-    currentPdfText = allPagesText.slice(1, 6).join("\n\n");
-    console.log("PDF Indexed. Pages:", allPagesText.length - 1);
-}
+// Text extraction is now handled by the Python Backend via /api/upload
 
 async function handleUpload(e) {
     const file = e.target.files[0];
@@ -192,6 +164,33 @@ async function handleUpload(e) {
 
         // Load immediately
         loadPDF(url, file.name);
+        
+        // Upload to Backend for RAG Indexing
+        await uploadToBackend(file);
+    }
+}
+
+async function uploadToBackend(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    addMessageToUI(`📤 Uploading **${file.name}** to AI Brain...`, 'ai');
+
+    try {
+        const response = await fetch('http://localhost:5000/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            addMessageToUI(`✅ **${file.name}** indexed! You can now ask questions about it.`, 'ai');
+        } else {
+            console.error('Backend upload failed');
+            addMessageToUI(`⚠️ Failed to index PDF on server. AI might not know about this file.`, 'ai');
+        }
+    } catch (err) {
+        console.error('Upload Error:', err);
+        addMessageToUI(`⚠️ Connection error: Is the Python server running?`, 'ai');
     }
 }
 
@@ -268,81 +267,33 @@ function removeTypingIndicator(id) {
 }
 
 async function callGeminiAPI(userMessage) {
-    if (!GEMINI_API_KEY) throw new Error("API Key missing");
+    const API_URL = 'http://localhost:5000/api/chat';
 
-    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
-    // Dynamic Context Construction
-    // 1. Intro (Pages 1-3)
-    let contextStr = "--- DOCUMENT INTRO ---\n";
-    for (let i = 1; i <= Math.min(3, allPagesText.length - 1); i++) {
-        contextStr += `[Page ${i}]: ${allPagesText[i]}\n`;
-    }
-
-    // 2. Focused Context (Current Page +/- 1)
-    contextStr += "\n--- CURRENT VIEW ---\n";
-    const startPage = Math.max(1, pageNum - 1);
-    const endPage = Math.min(allPagesText.length - 1, pageNum + 1);
-
-    for (let i = startPage; i <= endPage; i++) {
-        if (i > 3) { // Avoid duplication if overlapping with intro
-            contextStr += `[Page ${i}]: ${allPagesText[i]}\n`;
-        }
-    }
-
-    const systemText = `You are a helpful study assistant analyzing a PDF document.
-    
-    CONTEXT (Focused on Page ${pageNum}):
-    ${contextStr}
-    
-    INSTRUCTIONS:
-    1. Answer based on the provided context.
-    2. The user is currently looking at Page ${pageNum}. Prioritize information from this page.
-    3. If the answer is not in the context, say "I don't see that in the current pages (1-3 or ${startPage}-${endPage})."
-    4. Use LaTeX for math.
-    `;
-
-    const messages = [
-        { role: 'system', content: systemText },
-        ...chatHistory.slice(-6).map(m => ({
-            role: m.role === 'model' ? 'assistant' : 'user',
-            content: m.parts[0].text
-        })),
-        { role: 'user', content: userMessage }
-    ];
-
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${GEMINI_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: MODEL_NAME,
-            messages: messages
-        })
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API Error Log:", {
-            status: response.status,
-            statusText: response.statusText,
-            headers: Object.fromEntries(response.headers.entries()),
-            body: errorText
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: userMessage
+            })
         });
 
-        let errorMessage = `API Error (${response.status})`;
-        try {
-            const errorJson = JSON.parse(errorText);
-            errorMessage = errorJson.error?.message || errorMessage;
-        } catch (e) {
-            errorMessage = errorText; // Use raw text if not JSON
+        if (!response.ok) {
+            throw new Error(`Server Error: ${response.statusText}`);
         }
 
-        throw new Error(errorMessage);
-    }
+        const data = await response.json();
+        
+        // Handle potential error from backend
+        if (data.error) {
+            throw new Error(data.error);
+        }
 
-    const data = await response.json();
-    return marked.parse(data.choices[0].message.content);
+        return marked.parse(data.response);
+    } catch (error) {
+        console.error("Chat Error:", error);
+        throw error;
+    }
 }

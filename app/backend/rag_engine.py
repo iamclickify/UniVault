@@ -26,12 +26,12 @@ class RAGEngine:
         # For simplicity in this demo, we might use a default or setup specific
         # Note: chromadb.utils.embedding_functions.GoogleGenerativeAIEmbeddingFunction exists properly
         
-        self.embedding_fn = embedding_functions.GoogleGenerativeAiEmbeddingFunction(
-            api_key=self.api_key
-        )
+        # Switching to Default (Local) Embedding to avoid API 404 errors
+        # This uses all-MiniLM-L6-v2 locally
+        self.embedding_fn = embedding_functions.DefaultEmbeddingFunction()
         
         self.collection = self.chroma_client.create_collection(
-            name="univault_docs",
+            name="univault_docs_local",
             embedding_function=self.embedding_fn,
             get_or_create=True
         )

@@ -3,5 +3,8 @@ venv
 __pycache__
 *.pyc
 .env
-app/Rag/chroma_db
+chroma_db/
+**/chroma_db/
+uploads/
+**/__pycache__/
 ~$*
