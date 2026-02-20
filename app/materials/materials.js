@@ -272,7 +272,10 @@ function removeTypingIndicator(id) {
 }
 
 async function callGeminiAPI(userMessage) {
-    const API_URL = 'http://localhost:5000/api/chat';
+    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000' 
+        : ''; // Vercel Proxy
+    const API_URL = `${API_BASE.replace(/\/$/, '')}/api/chat`;
 
     try {
         const response = await fetch(API_URL, {
