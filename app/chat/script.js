@@ -238,7 +238,7 @@ function setupProfileMenu() {
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:5000' 
-    : ''; // Relative in production, or update this with your cloud URL
+    : 'https://univault-backend.onrender.com';
 const PYTHON_API_URL = `${API_BASE}/api`;
 
 function setupPdfUpload() {
