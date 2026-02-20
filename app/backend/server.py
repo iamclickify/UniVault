@@ -8,8 +8,12 @@ from rag_engine import RAGEngine
 load_dotenv()
 
 app = Flask(__name__)
-# Explicitly allow all origins and common headers for production
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Hyper-permissive CORS for production stability
+CORS(app, resources={r"/*": {
+    "origins": "*",
+    "methods": ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"]
+}})
 
 @app.before_request
 def log_request():
