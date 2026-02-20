@@ -177,10 +177,12 @@ async function uploadToBackend(file) {
     addMessageToUI(`📤 Uploading **${file.name}** to AI Brain...`, 'ai');
 
     try {
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
             ? 'http://localhost:5000' 
             : 'https://univault-backend.onrender.com'; 
-        const response = await fetch(`${API_BASE}/api/upload`, {
+        
+        const cleanBase = API_BASE.replace(/\/$/, '');
+        const response = await fetch(`${cleanBase}/api/upload`, {
             method: 'POST',
             body: formData
         });

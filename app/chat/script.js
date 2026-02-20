@@ -236,10 +236,24 @@ function setupProfileMenu() {
     }
 }
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:5000' 
     : 'https://univault-backend.onrender.com';
-const PYTHON_API_URL = `${API_BASE}/api`;
+
+// Ensure no trailing slash
+const PYTHON_API_URL = `${API_BASE.replace(/\/$/, '')}/api`;
+
+// Health check to debug "Failed to fetch"
+async function checkServerHealth() {
+    try {
+        const res = await fetch(`${API_BASE.replace(/\/$/, '')}/health`);
+        const data = await res.json();
+        console.log("Backend Health:", data);
+    } catch (e) {
+        console.error("Backend unreachable. This is likely a CORS issue or the server is sleeping.", e);
+    }
+}
+checkServerHealth();
 
 function setupPdfUpload() {
     const input = document.getElementById('pdfUploadInput');
