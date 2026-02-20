@@ -238,7 +238,7 @@ function setupProfileMenu() {
 
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:5000' 
-    : 'https://univault-backend.onrender.com';
+    : ''; // Use relative path in production (Vercel Proxy)
 
 // Ensure no trailing slash
 const PYTHON_API_URL = `${API_BASE.replace(/\/$/, '')}/api`;

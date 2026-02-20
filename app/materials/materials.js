@@ -179,7 +179,7 @@ async function uploadToBackend(file) {
     try {
         const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
             ? 'http://localhost:5000' 
-            : 'https://univault-backend.onrender.com'; 
+            : ''; // Use relative path in production (Vercel Proxy) 
         
         const cleanBase = API_BASE.replace(/\/$/, '');
         const response = await fetch(`${cleanBase}/api/upload`, {
