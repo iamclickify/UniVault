@@ -8,7 +8,14 @@ from rag_engine import RAGEngine
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Explicitly allow all origins and common headers for production
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+@app.before_request
+def log_request():
+    print(f"DEBUG: Incoming {request.method} request to {request.path}")
+    if request.is_json:
+        print(f"DEBUG: Payload: {request.json}")
 
 # Initialize RAG Engine
 # You might want to initialize with an API key from env

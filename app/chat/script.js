@@ -250,7 +250,11 @@ async function checkServerHealth() {
         const data = await res.json();
         console.log("Backend Health:", data);
     } catch (e) {
-        console.error("Backend unreachable. This is likely a CORS issue or the server is sleeping.", e);
+        console.error("Backend unreachable diagnostic:", {
+            errorName: e.name,
+            errorMessage: e.message,
+            url: `${API_BASE.replace(/\/$/, '')}/health`
+        });
     }
 }
 checkServerHealth();
@@ -317,9 +321,13 @@ async function sendMessage() {
 
         // 2. Add AI Response to UI & History
         addMessageToUI(responseText, 'ai', true);
-    } catch (error) {
+    } catch (err) {
         removeTypingIndicator(typingId);
-        addMessageToUI(`⚠️ **Server is waking up**: Render's free tier takes about 60 seconds to start. Please wait a moment and send your message again. <br><br> *(Error: ${error.message})*`, 'ai', false);
+        console.error('--- UPLOAD DIAGNOSTICS ---');
+        console.error('Error Name:', err.name);
+        console.error('Error Message:', err.message);
+        console.error('Stack:', err.stack);
+        addMessageToUI(`⚠️ **Connection Error**: The AI server might be "waking up". <br><br> Check the console (F12) for more details.`, 'ai');
     }
 }
 
@@ -349,7 +357,8 @@ async function callPythonRAG(userMessage) {
 
         return marked.parse(data.response);
     } catch (e) {
-        console.error("RAG API Error:", e);
+        console.error('--- CHAT DIAGNOSTICS ---');
+        console.error('Error Details:', e);
         throw e;
     }
 }
