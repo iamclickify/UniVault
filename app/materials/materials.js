@@ -193,7 +193,7 @@ async function uploadToBackend(file) {
         }
     } catch (err) {
         console.error('Upload Error:', err);
-        addMessageToUI(`⚠️ Connection error: Is the Python server running?`, 'ai');
+        addMessageToUI(`⚠️ **Connection Error**: The AI server might be "waking up" (Render's free plan sleeps after 15 mins). <br><br> Please wait **30-60 seconds** and try again.`, 'ai');
     }
 }
 

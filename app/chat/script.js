@@ -305,7 +305,7 @@ async function sendMessage() {
         addMessageToUI(responseText, 'ai', true);
     } catch (error) {
         removeTypingIndicator(typingId);
-        addMessageToUI(`Error: ${error.message}`, 'ai', false);
+        addMessageToUI(`⚠️ **Server is waking up**: Render's free tier takes about 60 seconds to start. Please wait a moment and send your message again. <br><br> *(Error: ${error.message})*`, 'ai', false);
     }
 }
 
