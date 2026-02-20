@@ -236,7 +236,10 @@ function setupProfileMenu() {
     }
 }
 
-const PYTHON_API_URL = 'http://localhost:5000/api';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:5000' 
+    : ''; // Relative in production, or update this with your cloud URL
+const PYTHON_API_URL = `${API_BASE}/api`;
 
 function setupPdfUpload() {
     const input = document.getElementById('pdfUploadInput');

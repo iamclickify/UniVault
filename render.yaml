@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: univault-backend
+    env: python
+    buildCommand: pip install -r app/backend/requirements.txt
+    startCommand: gunicorn --chdir app/backend server:app
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: 10000
+    disk:
+      name: chroma-data
+      mountPath: /opt/render/project/src/chroma_db
+      sizeGB: 1

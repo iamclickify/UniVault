@@ -177,7 +177,10 @@ async function uploadToBackend(file) {
     addMessageToUI(`📤 Uploading **${file.name}** to AI Brain...`, 'ai');
 
     try {
-        const response = await fetch('http://localhost:5000/api/upload', {
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:5000' 
+            : ''; 
+        const response = await fetch(`${API_BASE}/api/upload`, {
             method: 'POST',
             body: formData
         });
