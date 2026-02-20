@@ -79,7 +79,7 @@ def upload_document():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print("\n✅ RAG Backend is running!")
+    print("\n✅ UniVault Backend is running!")
     print(f"   - API listening on: http://localhost:{port}")
-    print("   - NOW: Open 'home/index.html' with Live Server to use the app.\n")
+    print("   - NOW: Open 'client/index.html' with Live Server to use the app.\n")
     app.run(host='0.0.0.0', port=port, debug=True)

@@ -177,25 +177,20 @@ async function uploadToBackend(file) {
     addMessageToUI(`📤 Uploading **${file.name}** to AI Brain...`, 'ai');
 
     try {
-        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? 'http://localhost:5000' 
-            : ''; // Use relative path in production (Vercel Proxy) 
+        const data = await UniVaultAPI.upload(file);
         
-        const cleanBase = API_BASE.replace(/\/$/, '');
-        const response = await fetch(`${cleanBase}/api/upload`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (response.ok) {
+        if (data && !data.error) {
             addMessageToUI(`✅ **${file.name}** indexed! You can now ask questions about it.`, 'ai');
         } else {
-            console.error('Backend upload failed');
+            console.error('Backend upload failed:', data?.error);
             addMessageToUI(`⚠️ Failed to index PDF on server. AI might not know about this file.`, 'ai');
         }
     } catch (err) {
-        console.error('Upload Error:', err);
-        addMessageToUI(`⚠️ **Connection Error**: The AI server might be "waking up" (Render's free plan sleeps after 15 mins). <br><br> Please wait **30-60 seconds** and try again.`, 'ai');
+        console.error('--- UPLOAD DIAGNOSTICS ---');
+        console.error('Error Name:', err.name);
+        console.error('Error Message:', err.message);
+        console.error('Stack:', err.stack);
+        addMessageToUI(`⚠️ **Connection Error**: The AI server might be "waking up". <br><br> Check the console (F12) for more details.`, 'ai');
     }
 }
 
@@ -272,28 +267,9 @@ function removeTypingIndicator(id) {
 }
 
 async function callGeminiAPI(userMessage) {
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-        ? 'http://localhost:5000' 
-        : ''; // Vercel Proxy
-    const API_URL = `${API_BASE.replace(/\/$/, '')}/api/chat`;
-
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                query: userMessage
-            })
-        });
+        const data = await UniVaultAPI.chat(userMessage);
 
-        if (!response.ok) {
-            throw new Error(`Server Error: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        
         // Handle potential error from backend
         if (data.error) {
             throw new Error(data.error);

@@ -236,28 +236,10 @@ function setupProfileMenu() {
     }
 }
 
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:5000' 
-    : ''; // Use relative path in production (Vercel Proxy)
-
-// Ensure no trailing slash
-const PYTHON_API_URL = `${API_BASE.replace(/\/$/, '')}/api`;
-
-// Health check to debug "Failed to fetch"
-async function checkServerHealth() {
-    try {
-        const res = await fetch(`${API_BASE.replace(/\/$/, '')}/health`);
-        const data = await res.json();
-        console.log("Backend Health:", data);
-    } catch (e) {
-        console.error("Backend unreachable diagnostic:", {
-            errorName: e.name,
-            errorMessage: e.message,
-            url: `${API_BASE.replace(/\/$/, '')}/health`
-        });
-    }
-}
-checkServerHealth();
+// Health check to debug "Failed to fetch" on startup
+UniVaultAPI.checkHealth().then(data => {
+    if (data) console.log("Backend Health:", data);
+});
 
 function setupPdfUpload() {
     const input = document.getElementById('pdfUploadInput');
@@ -334,23 +316,11 @@ async function sendMessage() {
 async function callPythonRAG(userMessage) {
     // We send just the query. The backend handles retrieval from vector DB.
     // If we want to support conversation history in RAG, we'd need to send history or manage it on backend.
-    // For this MVP, we send the current query.
-
+    // For this MVP, we async function callGeminiAPI(userMessage) {
     try {
-        const response = await fetch(`${PYTHON_API_URL}/chat`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ query: userMessage })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Server Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
+        const data = await UniVaultAPI.chat(userMessage);
+        
+        // Handle potential error from backend
         if (data.error) {
             throw new Error(data.error);
         }
