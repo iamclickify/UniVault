@@ -2,7 +2,7 @@
 (function () {
     const session = sessionStorage.getItem('univault_session');
     if (!session) {
-        window.location.href = '../../auth/login.html';
+        window.location.href = '../../../auth/login.html';
         return;
     }
     const userData = JSON.parse(session);
@@ -198,7 +198,7 @@ function setupEventListeners() {
             e.preventDefault();
             if (confirm('Log out?')) {
                 sessionStorage.removeItem('univault_session');
-                window.location.href = '../../auth/login.html';
+                window.location.href = '../../../auth/login.html';
             }
         });
     }
@@ -206,7 +206,7 @@ function setupEventListeners() {
     const logo = document.querySelector('.logo');
     if (logo) {
         logo.addEventListener('click', () => {
-            window.location.href = '../../home/index.html';
+            window.location.href = '../../index.html';
         });
     }
 
@@ -258,14 +258,7 @@ function setupPdfUpload() {
                 formData.append('file', file);
 
                 try {
-                    const response = await fetch(`${PYTHON_API_URL}/upload`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (!response.ok) throw new Error('Upload failed');
-
-                    const data = await response.json();
+                    const data = await UniVaultAPI.upload(file);
                     addSystemMessage(`Successfully ingested 📄 ${file.name} (${data.chunks} chunks)`);
 
                     // Allow multiple files? For now, let's just show it in UI

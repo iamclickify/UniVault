@@ -79,7 +79,7 @@ loginFormElement.addEventListener('submit', (e) => {
 
         // Redirect to main app after 1 second
         setTimeout(() => {
-            window.location.href = '../app/chat/index.html';
+            window.location.href = '../client/pages/chat/index.html';
         }, 1000);
     }, 500);
 });
@@ -187,7 +187,7 @@ window.addEventListener('load', () => {
     const session = sessionStorage.getItem('univault_session');
     if (session) {
         // User is already logged in, redirect to main app
-        window.location.href = '../app/chat/index.html';
+        window.location.href = '../client/pages/chat/index.html';
         return;
     }
 

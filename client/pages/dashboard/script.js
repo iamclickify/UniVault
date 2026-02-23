@@ -2,7 +2,7 @@
 // Check Auth
 const session = sessionStorage.getItem('univault_session');
 if (!session) {
-    window.location.href = '../../auth/login.html';
+    window.location.href = '../../../auth/login.html';
 }
 const userData = JSON.parse(session);
 
@@ -79,7 +79,7 @@ function setupProfileMenu() {
             e.preventDefault();
             if (confirm('Log out?')) {
                 sessionStorage.removeItem('univault_session');
-                window.location.href = '../../auth/login.html';
+                window.location.href = '../../../auth/login.html';
             }
         });
     }
